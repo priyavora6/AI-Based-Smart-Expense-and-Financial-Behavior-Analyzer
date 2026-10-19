@@ -1,0 +1,124 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // The admin dashboard uses this account. The custom claim is supported
+    // as an alternative for accounts managed by the Admin SDK.
+    function isAdmin() {
+      return signedIn()
+        && (
+          request.auth.token.email == 'neospend@dmin.com'
+          || request.auth.token.admin == true
+        );
+    }
+
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function ownsNewDocument() {
+      return signedIn()
+        && request.resource.data.userId == request.auth.uid;
+    }
+
+    function ownsExistingDocument() {
+      return signedIn()
+        && resource.data.userId == request.auth.uid;
+    }
+
+    match /users/{userId} {
+      allow read: if isAdmin() || isOwner(userId);
+
+      allow create: if isOwner(userId)
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.createdAt is timestamp;
+
+      allow update: if isOwner(userId)
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.createdAt == resource.data.createdAt;
+
+      allow delete: if false;
+    }
+
+    match /transactions/{documentId} {
+      allow read: if isAdmin() || ownsExistingDocument();
+      allow create: if ownsNewDocument();
+      allow update: if ownsExistingDocument()
+        && request.resource.data.userId == request.auth.uid;
+      allow delete: if ownsExistingDocument();
+    }
+
+    match /budgets/{documentId} {
+      allow read: if isAdmin() || ownsExistingDocument();
+      allow create: if ownsNewDocument();
+      allow update: if ownsExistingDocument()
+        && request.resource.data.userId == request.auth.uid;
+      allow delete: if ownsExistingDocument();
+    }
+
+    match /savings_goals/{documentId} {
+      allow read: if isAdmin() || ownsExistingDocument();
+      allow create: if ownsNewDocument();
+      allow update: if ownsExistingDocument()
+        && request.resource.data.userId == request.auth.uid;
+      allow delete: if ownsExistingDocument();
+    }
+
+    match /recurring_transactions/{documentId} {
+      allow read: if isAdmin() || ownsExistingDocument();
+      allow create: if ownsNewDocument();
+      allow update: if ownsExistingDocument()
+        && request.resource.data.userId == request.auth.uid;
+      allow delete: if ownsExistingDocument();
+    }
+
+    match /notifications/{documentId} {
+      allow read: if isAdmin() || ownsExistingDocument();
+      allow create: if ownsNewDocument();
+      allow update: if ownsExistingDocument()
+        && request.resource.data.userId == request.auth.uid;
+      allow delete: if ownsExistingDocument();
+    }
+
+    match /categories/{documentId} {
+      allow read: if isAdmin() || ownsExistingDocument();
+      allow create: if ownsNewDocument();
+      allow update: if ownsExistingDocument()
+        && request.resource.data.userId == request.auth.uid;
+      allow delete: if ownsExistingDocument();
+    }
+
+    match /feedback/{feedbackId} {
+      allow create: if ownsNewDocument();
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    match /predictions/{predictionId} {
+      allow read: if isAdmin();
+      allow create: if ownsNewDocument();
+      allow update, delete: if false;
+    }
+
+    match /auditLogs/{auditLogId} {
+      allow read: if isAdmin();
+      allow create: if ownsNewDocument();
+      allow update, delete: if false;
+    }
+
+    match /apiLogs/{apiLogId} {
+      allow read: if isAdmin();
+      allow create: if ownsNewDocument();
+      allow update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

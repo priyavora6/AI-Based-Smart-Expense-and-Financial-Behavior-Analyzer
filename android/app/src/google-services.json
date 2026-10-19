@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "29661089352",
+    "project_id": "neospend-97721",
+    "storage_bucket": "neospend-97721.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29661089352:android:4c46032d5674d5896c927d",
+        "android_client_info": {
+          "package_name": "com.marwadiuniversity.neospend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXOjfw89gsNTw5fO-lz3EYnzQTzCl_ABY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
